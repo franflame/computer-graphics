@@ -34,6 +34,15 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 8px;
+        padding: 6px 0;
+        border-bottom: 1px solid #ccc;
+      }
+
       button {
         margin: 5px;
         padding: 10px 15px;
@@ -46,19 +55,180 @@
       }
 
       button:hover {
-        background-color: #ccc;
+        filter: brightness(90%);
       }
 
-      input[type="range"] {
-        margin: 10px 0;
+      /* Muted color-specific buttons */
+      #red {
+        background-color: #e57373;
+        color: white;
       }
 
-      #referenceImage {
-        display: none;
-        margin-top: 20px;
-        border: 2px solid #444;
-        border-radius: 10px;
+      #red:hover {
+        background-color: #d32f2f;
       }
+
+      #green {
+        background-color: #81c784;
+        color: white;
+      }
+
+      #green:hover {
+        background-color: #388e3c;
+      }
+
+      #blue {
+        background-color: #64b5f6;
+        color: white;
+      }
+
+      #blue:hover {
+        background-color: #1976d2;
+      }
+
+      /* Clear button with lighter background */
+      #clearButton {
+        background-color: #f9f9f9;
+        color: #444;
+      }
+
+      #clearButton:hover {
+        background-color: #eee;
+      }
+
+      #surpriseButton {
+        background: linear-gradient(90deg, 
+          #f4a8a8,  /* Softer red */
+          #ffd999,  /* Softer orange */
+          #fff294,  /* Softer yellow */
+          #bce7bc,  /* Softer green */
+          #9cc9ff,  /* Softer blue */
+          #c9bce7,  /* Softer indigo */
+          #f2bcd9   /* Softer violet */
+        );
+        background-size: 300% 300%;
+        color: rgb(12, 12, 12);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid #888;
+        border-radius: 5px;
+      }
+
+      #surpriseButton:hover {
+        animation: rainbowShift 2s linear infinite;
+      }
+
+      @keyframes rainbowShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 100% 50%;
+        }
+      }
+
+    #pointButton, #triButton, #circleButton, #heartButton, #foxButton {
+      background: linear-gradient(90deg, #bde0fe, #a7d9f5); /* Soft blue tones */
+      color: #444; 
+      border: 1px solid #888;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #pointButton:hover, #triButton:hover, #circleButton:hover, 
+    #heartButton:hover, #foxButton:hover {
+      background: linear-gradient(90deg, #a7d9f5, #bde0fe); /* Reverse gradient on hover */
+    }
+
+    #getPaintingButton, #toggleButton {
+      background: linear-gradient(90deg, #f5d5f8, #d2c9f1); /* Soft orange/pink tones */
+      color: #444; 
+      border: 1px solid #888;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #getPaintingButton:hover, #toggleButton:hover {
+      background: linear-gradient(90deg, #ffd7c2, #ffdd99); /* Reverse gradient on hover */
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      outline: none;
+      margin: 10px 0;
+      transition: background-color 0.3s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #fff;
+      border: 2px solid #888;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #fff;
+      border: 2px solid #888;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #redSlide {
+      background: linear-gradient(90deg, #f4f4f4, red);
+    }
+
+    #redSlide::-webkit-slider-thumb {
+      background-color: red;
+    }
+
+    #greenSlide {
+      background: linear-gradient(90deg, #f4f4f4, green);
+    }
+
+    #greenSlide::-webkit-slider-thumb {
+      background-color: green;
+    }
+
+    #blueSlide {
+      background: linear-gradient(90deg, #f4f4f4, blue);
+    }
+
+    #blueSlide::-webkit-slider-thumb {
+      background-color: blue;
+    }
+
+    #sizeSlide {
+      background: linear-gradient(90deg, #f4f4f4, #aaa);
+    }
+
+    #sizeSlide::-webkit-slider-thumb {
+      background-color: #666;
+    }
+
+    #segmentsSlide {
+      background: linear-gradient(90deg, #f4f4f4, purple);
+    }
+
+    #segmentsSlide::-webkit-slider-thumb {
+      background-color: purple;
+    }
     </style>
   </head>
 
@@ -68,19 +238,25 @@
     </canvas>
 
     <div class="customization-container">
+      <div class="title">Choose a color</div>
       <p>
         <button type="button" id="green">Green</button>
         <button type="button" id="red">Red</button>
-        <button type="button" id="clearButton">Clear</button>
+        <button type="button" id="blue">Blue</button>
       </p>
 
+      <div class="title">Choose a shape</div>
       <p>
         <button type="button" id="pointButton">Point</button>
         <button type="button" id="triButton">Triangle</button>
         <button type="button" id="circleButton">Circle</button>
         <button type="button" id="heartButton">Heart</button>
         <button type="button" id="foxButton">Fox</button>
+      </p>
 
+      <p>
+        <button type="button" id="surpriseButton">Surprise Me!</button>
+        <button type="button" id="clearButton">Clear</button>
       </p>
 
       <p>
@@ -128,3 +304,4 @@
     <script src="ColoredPoints.js"></script>
   </body>
 </html>
+
