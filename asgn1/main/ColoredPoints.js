@@ -26,8 +26,6 @@ let u_Size;
 function setupWebGL() {
   canvas = document.getElementById('webgl');
 
-  // Get the rendering context for WebGL
-  //gl = getWebGLContext(canvas);
   gl = canvas.getContext("webgl", { preserveDrawingBuffer: true});
 
   if (!gl) {
@@ -70,39 +68,57 @@ const CIRCLE = 2;
 const HEART = 3;
 const FOX = 4;
 
-let g_selectedColor=[1.0, 1.0, 1.0, 1.0];
+let g_selectedColor = [1.0, 1.0, 1.0, 1.0];
 let g_selectedSize = 5;
 let g_selectedType = POINT;
 let g_segmentCount = 10;
 
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function addActionsForHtmlUI() {
   document.getElementById('green').onclick = function() { g_selectedColor = [0.0, 1.0, 0.0, 1.0]; };
   document.getElementById('red').onclick = function() { g_selectedColor = [1.0, 0.0, 0.0, 1.0]; };
+  document.getElementById('blue').onclick = function() { g_selectedColor = [0.0, 0.0, 1.0, 1.0]; };
+
   document.getElementById('clearButton').onclick = function() { g_shapesList = []; renderAllShapes(); };
 
-  document.getElementById('pointButton').onclick = function() { g_selectedType=POINT };
-  document.getElementById('triButton').onclick = function() { g_selectedType=TRIANGLE };
-  document.getElementById('circleButton').onclick = function() { g_selectedType=CIRCLE };
-  document.getElementById('heartButton').onclick = function() { g_selectedType=HEART };
-  document.getElementById('foxButton').onclick = function() { g_selectedType=FOX };
+  document.getElementById('pointButton').onclick = function() { g_selectedType = POINT };
+  document.getElementById('triButton').onclick = function() { g_selectedType = TRIANGLE };
+  document.getElementById('circleButton').onclick = function() { g_selectedType = CIRCLE };
+  document.getElementById('heartButton').onclick = function() { g_selectedType = HEART };
+  document.getElementById('foxButton').onclick = function() { g_selectedType = FOX };
 
-  document.getElementById('getPaintingButton').onclick = function() {paint();
+  document.getElementById('getPaintingButton').onclick = function() {
+    paint();
     setupWebGL();
-    // Retrieve <canvas> element
-  
     connectVariablesToGLSL();
-  
     addActionsForHtmlUI();
   };
 
-  document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0] = this.value/100; });
-  document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[1] = this.value/100; });
-  document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[2] = this.value/100; });
+  document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0] = this.value / 100; });
+  document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[1] = this.value / 100; });
+  document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[2] = this.value / 100; });
 
   document.getElementById('sizeSlide').addEventListener('mouseup', function() { g_selectedSize = this.value; });
   document.getElementById('segmentsSlide').addEventListener('mouseup', function() { g_segmentCount = this.value; });
 
+  document.getElementById('surpriseButton').onclick = function() {
+    g_selectedColor = [getRandomFloat(0, 1), getRandomFloat(0, 1), getRandomFloat(0, 1), 1.0];
+
+    g_selectedType = getRandomInt(POINT, FOX);
+
+    g_selectedSize = getRandomInt(5, 40);
+
+    g_segmentCount = getRandomInt(10, 100);
+  };
 }
+
 
 function main() {
   setupWebGL();
@@ -306,223 +322,223 @@ function paint() {
   // Example: Add multiple triangles
   // upper left wing 
   drawTriangle2(
-      [0, 0, -100, 0, -100, 100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, -100, 0, -100, 100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
   drawTriangle2(
-      [0, 0, 0, 40, -100, 100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, 0, 40, -100, 100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
 
   // lower left wing
   drawTriangle2(
-      [0, 0, -70, 0, -90, -100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, -70, 0, -90, -100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
   drawTriangle2(
-      [0, 0, 0, -60, -90, -100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, 0, -60, -90, -100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
 
   // torso left
   drawTriangle2(
-      [-10, 0, 0, 10, 0, -10], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [-10, 0, 0, 10, 0, -10], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   drawTriangle2(
-      [-10, 20, 0, 30, 0, 10], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [-10, 20, 0, 30, 0, 10], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   drawTriangle2(
-      [-10, 40, 0, 50, 0, 30], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [-10, 40, 0, 50, 0, 30], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   // lower torso left
   drawTriangle2(
-      [-10, -20, 0, -80, 0, -10], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [-10, -20, 0, -80, 0, -10], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   // upper upper wing deco
 
   drawTriangle2(
-      [-80, 75, -20, 20, -20, 40], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-80, 75, -20, 20, -20, 40], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // upper lower wing deco
 
   drawTriangle2(
-      [-95, 90, -95, 85, -85, 85], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-95, 90, -95, 85, -85, 85], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [-95, 75, -95, 80, -85, 80], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-95, 75, -95, 80, -85, 80], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [-95, 65, -85, 75, -85, 65], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-95, 65, -85, 75, -85, 65], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // longer decos 
 
   drawTriangle2(
-      [-95, 55, -85, 35, -45, 30], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-95, 55, -85, 35, -45, 30], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [-95, 10, -85, 25, -45, 30], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-95, 10, -85, 25, -45, 30], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [-95, 5, -45, 20, -10, 5], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-95, 5, -45, 20, -10, 5], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // lower wing decos 
   // lower right 
 
   drawTriangle2(
-      [-20, -40, -20, -60, -70, -80], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-20, -40, -20, -60, -70, -80], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // middle 
   drawTriangle2(
-      [-20, -30, -70, -50, -70, -65], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-20, -30, -70, -50, -70, -65], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // upper
 
   drawTriangle2(
-      [-10, -15, -60, -20, -65, -35], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [-10, -15, -60, -20, -65, -35], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // antennas left
 
   drawTriangle2(
-      [-10, 60, 0, 50, -8, 55], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [-10, 60, 0, 50, -8, 55], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   // upper right wing 
          drawTriangle2(
-      [0, 0, 100, 0, 100, 100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, 100, 0, 100, 100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
   drawTriangle2(
-      [0, 0, 0, 40, 100, 100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, 0, 40, 100, 100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
 
   // lower right wing
   drawTriangle2(
-      [0, 0, 70, 0, 90, -100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, 70, 0, 90, -100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
   drawTriangle2(
-      [0, 0, 0, -60, 90, -100], // Triangle 1 (centered coordinate system)
-      [0.380, 0.184, 0.0228, 1] // Red color
+      [0, 0, 0, -60, 90, -100], 
+      [0.380, 0.184, 0.0228, 1]   
   );
 
    // torso right
    drawTriangle2(
-      [10, 0, 0, 10, 0, -10], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [10, 0, 0, 10, 0, -10], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   drawTriangle2(
-      [10, 20, 0, 30, 0, 10], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [10, 20, 0, 30, 0, 10], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   drawTriangle2(
-      [10, 40, 0, 50, 0, 30], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [10, 40, 0, 50, 0, 30], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   // lower torso left
   drawTriangle2(
-      [10, -20, 0, -80, 0, -10], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [10, -20, 0, -80, 0, -10], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   // right antenna
 
   drawTriangle2(
-      [10, 60, 0, 50, 8, 55], // Triangle 1 (centered coordinate system)
-      [0.750, 0.746, 0.743, 1] // Red color
+      [10, 60, 0, 50, 8, 55], 
+      [0.750, 0.746, 0.743, 1]   
   );
 
   // right side wing decos 
 
   drawTriangle2(
-      [80, 75, 20, 20, 20, 40], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [80, 75, 20, 20, 20, 40], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // upper lower wing deco
 
   drawTriangle2(
-      [95, 90, 95, 85, 85, 85], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [95, 90, 95, 85, 85, 85], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [95, 75, 95, 80, 85, 80], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [95, 75, 95, 80, 85, 80], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [95, 65, 85, 75, 85, 65], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [95, 65, 85, 75, 85, 65], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // longer decos 
 
   drawTriangle2(
-      [95, 55, 85, 35, 45, 30], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [95, 55, 85, 35, 45, 30], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [95, 10, 85, 25, 45, 30], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [95, 10, 85, 25, 45, 30], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   drawTriangle2(
-      [95, 5, 45, 20, 10, 5], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [95, 5, 45, 20, 10, 5], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // lower wing decos 
   // lower right 
 
   drawTriangle2(
-      [20, -40, 20, -60, 70, -80], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [20, -40, 20, -60, 70, -80], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // middle 
   drawTriangle2(
-      [20, -30, 70, -50, 70, -65], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [20, -30, 70, -50, 70, -65], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 
   // upper
 
   drawTriangle2(
-      [10, -15, 60, -20, 65, -35], // Triangle 1 (centered coordinate system)
-      [0.910, 0.430, 0.0364, 1] // Red color
+      [10, -15, 60, -20, 65, -35], 
+      [0.910, 0.430, 0.0364, 1]   
   );
 }
