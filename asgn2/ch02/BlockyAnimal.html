@@ -2,12 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Change a point color</title>
+    <title>Blocky Animal</title>
     <style>
-      /* Initially hide the image */
-      #referenceImage {
-        display: none;
-      }
+
     </style>
   </head>
 
@@ -18,12 +15,6 @@
 
     <p>
       <p id="performance"> XXX </p>
-    </p>
-
-
-
-    <p><button type="button" id="getPaintingButton">Show Example Painting</button>
-      <button id="toggleButton">Show Painting Reference</button>
     </p>
 
     <p>
@@ -52,9 +43,6 @@
     <p> 
       <button type="button" id="animationOnButton">ON</button>
       <button type="button" id="animationOffButton">OFF</button></p>
-    <p>
-      <img id="referenceImage" src="reference.jpg" style="width:400px;height:400px;" alt="Butterfly Painting">
-    </p>
     <script src="../lib/webgl-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>
     <script src="../lib/cuon-utils.js"></script>
@@ -63,29 +51,6 @@
     <script src="Triangle.js"></script>
     <script src="Cube.js"></script>
     <script src="Pyramid.js"></script>
-
-    <script>
-      const image = document.getElementById('referenceImage');
-      const button = document.getElementById('toggleButton');
-  
-      // Initialize button text based on the image's initial display state
-      if (getComputedStyle(image).display === 'none') {
-        button.textContent = 'Show Painting Reference';
-      } else {
-        button.textContent = 'Hide Painting Reference';
-      }
-  
-      button.addEventListener('click', () => {
-        if (image.style.display === 'none' || getComputedStyle(image).display === 'none') {
-          image.style.display = 'block';
-          button.textContent = 'Hide Painting Reference';
-        } else {
-          image.style.display = 'none';
-          button.textContent = 'Show Painting Reference';
-        }
-      });
-    </script>
-  
 
     <script src="BlockyAnimal.js"></script>
   </body>
