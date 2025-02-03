@@ -19,16 +19,16 @@ class Pyramid {
         drawTriangle3D([-b, 0, -b,   -b, 0, b,   b, 0, b]);
         
         // Sides (triangles)
-        gl.uniform4f(u_FragColor, rgba[0] * 0.9, rgba[1] * 0.9, rgba[2] * 0.9, rgba[3]);
+        gl.uniform4f(u_FragColor, rgba[0] * 0.95, rgba[1] * 0.95, rgba[2] * 0.95, rgba[3]);
         drawTriangle3D([-b, 0, -b,   b, 0, -b,   0, h, 0]);
         
-        gl.uniform4f(u_FragColor, rgba[0] * 0.8, rgba[1] * 0.8, rgba[2] * 0.8, rgba[3]);
+        gl.uniform4f(u_FragColor, rgba[0] * 0.90, rgba[1] * 0.9, rgba[2] * 0.9, rgba[3]);
         drawTriangle3D([b, 0, -b,   b, 0, b,   0, h, 0]);
         
-        gl.uniform4f(u_FragColor, rgba[0] * 0.7, rgba[1] * 0.7, rgba[2] * 0.7, rgba[3]);
+        gl.uniform4f(u_FragColor, rgba[0] * 0.85, rgba[1] * 0.85, rgba[2] * 0.85, rgba[3]);
         drawTriangle3D([b, 0, b,   -b, 0, b,   0, h, 0]);
         
-        gl.uniform4f(u_FragColor, rgba[0] * 0.6, rgba[1] * 0.6, rgba[2] * 0.6, rgba[3]);
+        gl.uniform4f(u_FragColor, rgba[0] * 0.80, rgba[1] * 0.80, rgba[2] * 0.80, rgba[3]);
         drawTriangle3D([-b, 0, b,   -b, 0, -b,   0, h, 0]);
     }
 }
