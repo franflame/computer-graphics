@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Change a point color</title>
+    <style>
+      /* Initially hide the image */
+      #referenceImage {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body onload="main()">
+    <canvas id="webgl" width="400" height="400">
+    Please use a browser that supports "canvas"
+    </canvas>
+
+    <p>
+      <p id="performance"> XXX </p>
+    </p>
+
+
+
+    <p><button type="button" id="getPaintingButton">Show Example Painting</button>
+      <button id="toggleButton">Show Painting Reference</button>
+    </p>
+
+    <p>
+      Front upper leg <input type="range" min="-90" max="90" value="0" class="slider" id="frontUpLegSlide">
+    </p>  
+    <p>
+      Front lower leg <input type="range" min="-90" max="0" value="0" class="slider" id="frontLowLegSlide">
+    </p>  
+
+    <p>
+      Back upper leg <input type="range" min="-60" max="60" value="0" class="slider" id="backUpLegSlide">
+    </p>  
+    <p>
+      Back lower leg <input type="range" min="-90" max="0" value="0" class="slider" id="backLowLegSlide">
+    </p>  
+    <p>
+      Feet <input type="range" min="-20" max="20" value="0" class="slider" id="footSlide">
+    </p>  
+    <p>
+      Neck <input type="range" min="-45" max="45" value="0" class="slider" id="neckSlide">
+    </p>  
+    <p>
+      Camera Angle <input type="range" min="-180" max="180" value="0" class="slider" id="angleSlide">
+    </p>
+
+    <p> 
+      <button type="button" id="animationOnButton">ON</button>
+      <button type="button" id="animationOffButton">OFF</button></p>
+    <p>
+      <img id="referenceImage" src="reference.jpg" style="width:400px;height:400px;" alt="Butterfly Painting">
+    </p>
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+
+    <script src="Triangle.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Pyramid.js"></script>
+
+    <script>
+      const image = document.getElementById('referenceImage');
+      const button = document.getElementById('toggleButton');
+  
+      // Initialize button text based on the image's initial display state
+      if (getComputedStyle(image).display === 'none') {
+        button.textContent = 'Show Painting Reference';
+      } else {
+        button.textContent = 'Hide Painting Reference';
+      }
+  
+      button.addEventListener('click', () => {
+        if (image.style.display === 'none' || getComputedStyle(image).display === 'none') {
+          image.style.display = 'block';
+          button.textContent = 'Hide Painting Reference';
+        } else {
+          image.style.display = 'none';
+          button.textContent = 'Show Painting Reference';
+        }
+      });
+    </script>
+  
+
+    <script src="BlockyAnimal.js"></script>
+  </body>
+</html>
