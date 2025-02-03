@@ -84,14 +84,8 @@ function connectVariablesToGLSL() {
     }
 }
 
-const POINT = 0;
-const TRIANGLE = 1;
-const CIRCLE = 2;
-
 let g_selectedColor=[1.0, 1.0, 1.0, 1.0];
 let g_selectedSize = 5;
-let g_selectedType = POINT;
-let g_segmentCount = 10;
 let g_globalAngle = 0;
 let g_frontUpLegAngle = 0;
 let g_frontLowLegAngle = 0;
@@ -210,6 +204,7 @@ function renderScene() {
     upperLeg1.matrix.rotate(270, 0,0,1);  
     upperLeg1.matrix.rotate(90, 0,1,0); 
     upperLeg1.matrix.scale(0.1,0.18,0.15); 
+    upperLeg1.matrix.translate(0, 0.1, 0);
     
     // upperLeg1.matrix.scale(0.1,0.20,0.2);
     // upperLeg1.matrix.rotate(180, 1,0,0);
@@ -270,9 +265,7 @@ function renderScene() {
     else {
       upperLeg2.matrix.rotate(g_frontUpLegAngle, 0,1,0); // side to side
     }
-    // upperLeg1.matrix.scale(0.1,0.19,0.12);
-    // upperLeg1.matrix.setTranslate(-2.25, -3.75, 1.0);
-    //upperLeg1.matrix.scale(0.5,1.0,1.0);
+
     upperLeg2.render();
 
     var lowerLeg2 = new Cube();
@@ -305,6 +298,7 @@ function renderScene() {
     upperLeg3.matrix.rotate(270, 0,0,1);  
     upperLeg3.matrix.rotate(90, 0,1,0); 
     upperLeg3.matrix.scale(0.1,0.18,0.15); 
+    upperLeg3.matrix.translate(0, 0.1, 0);
     
 
     if (g_animation && special_animation == false) {
@@ -317,19 +311,16 @@ function renderScene() {
       upperLeg3.matrix.rotate(g_backUpLegAngle, 0,1,0); // side to side
     }
   
-    // upperLeg1.matrix.scale(0.1,0.19,0.12);
-    // upperLeg1.matrix.setTranslate(-3.25, -3.75, 1.0);
-    //upperLeg1.matrix.scale(0.5,1.0,1.0);
+
     upperLeg3.render();
   
     var lowerLeg3 = new Cube();
     lowerLeg3.color = [1.0, 0.4, 0.0, 1.0];
-    //body.matrix.rotate(-5, 1,0,0);
+
     lowerLeg3.matrix = upperLeg3.matrix;
-    //lowerLeg1.matrix.rotate(90, 1,0,0);
+
     lowerLeg3.matrix.translate(0.0, 0.0, 0.75);
-    //lowerLeg1.matrix.scale(1, 1.2, 1);
-    //lowerLeg3.matrix.rotate(g_backLowLegAngle, 0,1,0);
+
     if (g_animation && special_animation == false) {
       lowerLeg3.matrix.rotate(-15*(Math.sin(g_seconds)+1), 0,1,0); // side to side
     }
@@ -393,7 +384,7 @@ function renderScene() {
     foot4.render();
 
     var body = new Cube();
-    body.color = [0.8, 0.3, 0.0, 1.0];
+    body.color = [1.0, 0.3, 0.0, 1.0];
     body.matrix.translate(-.25, -.55, 0.0);
     //body.matrix.rotate(-5, 1,0,0);
     body.matrix.scale(0.5,0.4,0.65);
@@ -404,7 +395,7 @@ function renderScene() {
     body.render();
 
     var neck = new Cube();
-    neck.color = [0.8, 0.3, 0.0, 1.0];
+    neck.color = [0.9, 0.3, 0.0, 1.0];
     neck.matrix.translate(-0.05, -.2, 0.10);
     //body.matrix.rotate(-5, 1,0,0);
     neck.matrix.scale(0.1,0.20,0.1);
@@ -434,7 +425,14 @@ function renderScene() {
     right_ear.matrix.set(head.matrix);
 
     var left_ear = new Pyramid();
+
+    var left_eye = new Cube();
+    left_eye.color = [0.25, 0.25, 0.25, 1.0];
+    left_eye.matrix.set(head.matrix);
+
     
+
+
 
     var tail = new Pyramid();
     tail.color = [0.95, 0.3, 0.0, 1.0];
@@ -448,7 +446,7 @@ function renderScene() {
     tail.render();
 
     var snout = new Pyramid();
-    snout.color = [0.95, 0.3, 0.0, 1.0];
+    snout.color = [0.98, 0.3, 0.0, 1.0];
     snout.matrix = head.matrix;
     snout.matrix.rotate(270, 1, 0, 0);
     snout.matrix.translate(0.5,0.0, 0.5);
@@ -474,6 +472,27 @@ function renderScene() {
     right_ear.matrix.translate(1,0,0);
     left_ear.render();
 
+    
+    left_eye.matrix.scale(0.15, 0.15, 0.15);
+    left_eye.matrix.translate(0.5, 4, -2.5);
+    left_eye.render();
+
+    var right_eye = new Cube();
+    right_eye.color = [0.25, 0.25, 0.25, 1.0];
+    right_eye.matrix.set(left_eye.matrix);
+    right_eye.matrix.translate(4.5, 0, 0);
+    right_eye.render();
+
+    var tip = new Cube();
+    tip.color = [0.25, 0.25, 0.25, 1.0];
+    tip.matrix.set(left_eye.matrix);
+    tip.matrix.translate(2.25, -1.25, -4);
+    tip.render();
+
+    // right_eye.color(0.9, 0.9, 0.9, 1.0);
+    // right_eye.matrix.scale(0.15, 0.15, 0.15);
+    // right_eye.render();
+
     // taken from fjtria
     var duration = performance.now() - currentStartTime;
     sendTextToHTML(" ms: " + Math.floor(duration) + " fps: " + Math.floor(10000 / duration) / 10, "performance");
@@ -487,4 +506,3 @@ function renderScene() {
     }
     htmlElm.innerHTML = text;
 }
-
