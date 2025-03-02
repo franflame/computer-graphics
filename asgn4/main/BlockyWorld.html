@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Blocky World</title>
+    <style>
+      body {
+        background-color: #f8e8e8; /* Pastel pink background */
+        font-family: Arial, sans-serif;
+        text-align: center;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+      }
+      #webgl {
+        display: block;
+        margin: 20px auto;
+        border: 3px solid #ccc;
+        border-radius: 10px;
+      }
+      p {
+        font-size: 18px;
+        max-width: 600px;
+        margin: 10px auto;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 10px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body onload="main()">
+    <canvas id="webgl" width="500" height="500">
+      Please use a browser that supports "canvas"
+    </canvas>
+
+    <p id="performance">XXX</p>
+
+    <p> Light Position <br>
+      Light X <input type="range" min="-250" max="250" value="0" class="slider" id="lightSlideX">
+      Light Y <input type="range" min="-250" max="250" value="100" class="slider" id="lightSlideY">
+      Light Z <input type="range" min="-250" max="250" value="-200" class="slider" id="lightSlideZ">
+    </p>
+
+    <p> Light Color <br>
+      Red <input type="range" min="0" max="100" value="100" class="slider" id="redSlide">
+      Green <input type="range" min="0" max="100" value="100" class="slider" id="greenSlide">
+      Blue <input type="range" min="0" max="100" value="100" class="slider" id="blueSlide">
+    </p>
+
+
+    <p>Normal Visualization<br>
+
+      <button type="button" id="normalOn">ON</button>
+      <button type="button" id="normalOff">OFF</button></p>
+
+      
+    <p> Point Light<br>
+
+      <button type="button" id="lightOn">ON</button>
+      <button type="button" id="lightOff">OFF</button></p>
+    
+    <p> Spot light<br>
+      <button type="button" id="spotLightOn">ON</button>
+      <button type="button" id="spotLightOff">OFF</button></p>
+      
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+
+    <script src="Triangle.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Pyramid.js"></script>
+    <script src="Camera.js"></script>
+    <script src="Terrain.js"></script>
+    <script src="Sphere.js"></script>
+
+    <script src="BlockyWorld.js"></script>
+  </body>
+</html>
