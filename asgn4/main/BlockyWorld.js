@@ -119,8 +119,14 @@ var FSHADER_SOURCE = `
 
     if (u_spotLightOn && spot_angle > 0.5) {
       //gl_FragColor = vec4((specular+diffuse+ambient)*pow(dot(D, -L), spot_expo), 1.0)
-      float spot_factor = pow(spot_angle,-0.9);
+      float spot_factor = pow(spot_angle,0.5);
       gl_FragColor = vec4((diffuse + ambient + specular) * spot_factor, 1.0);
+      //gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+    }
+      else if (u_spotLightOn && spot_angle < 0.5) {
+      //gl_FragColor = vec4((specular+diffuse+ambient)*pow(dot(D, -L), spot_expo), 1.0)
+      //float spot_factor = pow(spot_angle,-0.9);
+      gl_FragColor = vec4(0,0,0, 1.0);
       //gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
     }
 
@@ -132,6 +138,17 @@ var FSHADER_SOURCE = `
           gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
       }
   }
+    if (u_lightOn && u_spotLightOn) {
+        if (spot_angle > 0.5) {
+          float spot_factor = pow(spot_angle,-0.9);
+          gl_FragColor = vec4((diffuse + ambient + specular) * spot_factor, 1.0);
+          }
+        else {
+        gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+        }
+    }
+    
+  
 
     
 }`
@@ -370,10 +387,10 @@ function addActionsForHtmlUI() {
   document.getElementById('normalOn').onclick = function() { g_normalOn = true;};
   document.getElementById('normalOff').onclick = function() { g_normalOn = false; };
 
-  document.getElementById('lightOn').onclick = function() { g_lightOn = true;  g_spotLightOn = false;};
+  document.getElementById('lightOn').onclick = function() { g_lightOn = true;};  //g_spotLightOn = false;};
   document.getElementById('lightOff').onclick = function() { g_lightOn = false; };
 
-  document.getElementById('spotLightOn').onclick = function() { g_spotLightOn = true; g_lightOn = false;};
+  document.getElementById('spotLightOn').onclick = function() { g_spotLightOn = true;}; //g_lightOn = false;};
   document.getElementById('spotLightOff').onclick = function() { g_spotLightOn = false; };
 
   
@@ -1224,7 +1241,7 @@ function renderScene() {
     var light = new Cube();
     light.textureNum = 2;
     light.color = [2, 2, 0, 1];
-    if (!g_spotLightOn) {
+    if (!g_spotLightOn || g_spotLightOn && g_lightOn) {
       g_lightPos[0] = Math.sin(g_seconds);
     }
     
@@ -1399,5 +1416,3 @@ function renderScene() {
 
     console.log("at end");
 }
-
-
