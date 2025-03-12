@@ -1,0 +1,565 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Background CSS</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background-size: cover;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/three-csg.js@0.9.3/build/three-csg.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://threejs.org/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from '/OrbitControls.js';
+  import { GUI } from '/lil-gui.module.min.js';
+  import {OBJLoader} from '/OBJLoader.js';
+  import {MTLLoader} from '/MTLLoader.js';
+
+  function main() {
+
+    class MinMaxGUIHelper {
+    constructor(obj, minProp, maxProp, minDif) {
+        this.obj = obj;
+        this.minProp = minProp;
+        this.maxProp = maxProp;
+        this.minDif = minDif;
+    }
+    get min() {
+        return this.obj[this.minProp];
+    }
+    set min(v) {
+        this.obj[this.minProp] = v;
+        this.obj[this.maxProp] = Math.max(this.obj[this.maxProp], v + this.minDif);
+    }
+    get max() {
+        return this.obj[this.maxProp];
+    }
+    set max(v) {
+        this.obj[this.maxProp] = v;
+        this.min = this.min;  // this will call the min setter
+    }
+    }
+    function updateCamera() {
+    camera.updateProjectionMatrix();
+    }
+
+    class ColorGUIHelper {
+      constructor(object, prop) {
+        this.object = object;
+        this.prop = prop;
+      }
+      get value() {
+        return `#${this.object[this.prop].getHexString()}`;
+      }
+      set value(hexString) {
+        this.object[this.prop].set(hexString);
+      }
+    }
+
+
+
+    const canvas = document.querySelector( '#c' );
+    const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+
+    const fov = 75;
+    const aspect = 2; // the canvas default
+    const near = 0.1;
+    const far = 35;
+    const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+    camera.position.z = 2;
+
+    const scene = new THREE.Scene();
+    const gui = new GUI();
+    gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
+    const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
+    gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
+    gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
+    const controls = new OrbitControls( camera, canvas );
+    controls.target.set( -1, 0, 2 );
+    controls.update();
+
+    {
+      const mtlLoader = new MTLLoader();
+      mtlLoader.load('untitled.mtl', (mtl) => {
+        mtl.preload();
+        const objLoader = new OBJLoader();
+
+        objLoader.setMaterials(mtl);
+        objLoader.load('untitled.obj', (root) => {
+          root.position.set(-7, 0, -10);
+          scene.add(root);
+        });
+    });
+  }
+    
+// Ambient Light Setup
+    const ambientColor = 0xFFFFFF;
+    const ambientIntensity = 1;
+    const ambientLight = new THREE.AmbientLight(ambientColor, ambientIntensity);  // Add ambient light
+    scene.add(ambientLight);
+
+    // Directional Light Setup
+    const directionalColor = 0xFFFFFF;
+    const directionalIntensity = 1;
+    const directionalLight = new THREE.DirectionalLight(directionalColor, directionalIntensity);
+    directionalLight.position.set(-1, 2, 4); // Position the directional light
+    scene.add(directionalLight);
+
+    const pointColor = 0xf53814;
+    const pointIntensity = 100;
+    const pointLight = new THREE.PointLight(pointColor, pointIntensity);
+    pointLight.position.set(0, 10, 0);
+    scene.add(pointLight);
+
+    renderer.shadowMap.enabled = true;
+    directionalLight.castShadow = true;
+    pointLight.castShadow = true;
+
+
+    // Adding GUI Controls for Lighting
+    gui.addColor(new ColorGUIHelper(ambientLight, 'color'), 'value').name('Ambient Light Color');
+    gui.add(ambientLight, 'intensity', 0, 5, 0.01).name('Ambient Light Intensity');
+
+    gui.addColor(new ColorGUIHelper(directionalLight, 'color'), 'value').name('Directional Light Color');
+    gui.add(directionalLight, 'intensity', 0, 5, 0.01).name('Directional Light Intensity');
+
+    const helper = new THREE.PointLightHelper(pointLight);
+    scene.add(helper);
+    function updateLight() {
+      helper.update();
+    }
+
+    function makeXYZGUI(gui, vector3, name, onChangeFn) {
+      const folder = gui.addFolder(name);
+      folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
+      folder.add(vector3, 'y', 0, 10).onChange(onChangeFn);
+      folder.add(vector3, 'z', -10, 10).onChange(onChangeFn);
+      folder.open();
+    }
+
+
+    gui.addColor(new ColorGUIHelper(pointLight, 'color'), 'value').name('color');
+    gui.add(pointLight, 'intensity', 0, 50, 0.01);
+    
+    makeXYZGUI(gui, pointLight.position, 'position', updateLight);
+    //makeXYZGUI(gui, pointLight.target.position, 'target', updateLight);
+
+    const boxWidth = 1;
+    const boxHeight = 1;
+    const boxDepth = 1;
+    const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
+
+    const loader1 = new THREE.TextureLoader();
+    const texture1 = loader1.load( 'stone_texture.jpg' );
+    texture1.colorSpace = THREE.SRGBColorSpace;
+
+    const fogColor = 0xdbd7d7;
+    const fogDensity = 0.06;
+    scene.fog = new THREE.FogExp2(fogColor, fogDensity);
+  
+    // const fogColor = 0xFFFFFF;  // white
+    // const fogNear = 4;
+    // const fogFar = 7;
+    // scene.fog = new THREE.Fog(fogColor, fogNear, fogFar);
+
+    const floorGeom = new THREE.BoxGeometry( 15, 15, 15 );
+
+    const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(128, {
+      generateMipmaps: true,
+      minFilter: THREE.LinearMipmapLinearFilter,
+    })
+
+    const cubeCamera1 = new THREE.CubeCamera(0.1, 1000, cubeRenderTarget1)
+
+    const material1 = new THREE.MeshPhongMaterial({
+      envMap: cubeRenderTarget1.texture,
+    })
+
+    // const pool_geo = new THREE.BoxGeometry( 10, 20, 40 ); 
+    // const pool_mat = new THREE.MeshStandardMaterial({
+    //   color: 0x1E90FF, // Water color (adjust as needed)
+    //   metalness: 0.5,   // Reflective property
+    //   roughness: 0.1,   // Smooth surface for reflection
+    //   envMapIntensity: 1.0  // Adjust reflection intensity
+    // });
+
+    // const pool_cub = new THREE.Mesh(pool_geo, pool_mat);
+
+    
+    const pool_geo = new THREE.BoxGeometry( 10, 20, 60 ); 
+    const pool_mat = new THREE.MeshStandardMaterial({
+      color: 0x1E90FF, // Water color (adjust as needed)
+      metalness: 0.5,   // Reflective property
+      roughness: 0.1,   // Smooth surface for reflection
+      envMapIntensity: 1.0  // Adjust reflection intensity
+    });
+
+    const pool_cub = new THREE.Mesh(pool_geo, material1);
+    pool_cub.add(cubeCamera1);
+
+    scene.add(pool_cub);
+    pool_cub.receiveShadow = true;
+    pool_cub.position.y = -11;
+    pool_cub.position.x = -7;
+    pool_cub.position.z = 2;
+
+
+    const side_floor_geo = new THREE.BoxGeometry( 10, 20, 40 ); 
+    const side_floor_mat = new THREE.MeshStandardMaterial({
+      //color: 0x707070, // Water color (adjust as needed)
+      map: texture1,
+      metalness: 0.1,   // Reflective property
+      roughness: 1.0,   // Smooth surface for reflection
+      envMapIntensity: 0.3  // Adjust reflection intensity
+    });
+
+    const side_floor = new THREE.Mesh(side_floor_geo, side_floor_mat);
+    side_floor.receiveShadow = true;
+
+    scene.add(side_floor);
+    side_floor.position.y = -10.75;
+    side_floor.position.x = 3;
+    side_floor.position.z = 2;
+
+    const handle_geo = new THREE.CylinderGeometry(
+	    0.05, 0.05, 40, 8 );
+    const handle_mat = new THREE.MeshStandardMaterial({
+      color: 0x707070, // Water color (adjust as needed)
+      metalness: 0.1,   // Reflective property
+      roughness: 1.0,   // Smooth surface for reflection
+      envMapIntensity: 0.3  // Adjust reflection intensity
+    });
+
+    const handle = new THREE.Mesh(handle_geo, handle_mat);  
+    handle.position.x = -1.5; 
+    handle.rotation.x = 1.57;
+    //handle.position.y = -0.5;
+    handle.castShadow = true;
+    handle.receiveShadow = true;
+    scene.add(handle);
+
+    let railing_z_pos = -4;
+
+    const rail_geo = new THREE.CylinderGeometry(
+	    0.05, 0.05, 1, 4 );
+    const rail_mat = new THREE.MeshStandardMaterial({
+      color: 0x707070, // Water color (adjust as needed)
+      metalness: 0.1,   // Reflective property
+      roughness: 1.0,   // Smooth surface for reflection
+      envMapIntensity: 0.3  // Adjust reflection intensity
+    }); 
+    
+
+    for (let i=0; i< 27; i++) {
+      const rail = new THREE.Mesh(rail_geo, rail_mat);
+      rail.position.x = -1.5; 
+      rail.position.z = railing_z_pos;
+      rail.position.y = -0.5;
+
+      //handle.position.y = -0.5;
+      rail.receiveShadow = true;
+      rail.castShadow = true;
+      scene.add(rail);
+      railing_z_pos += 1;
+
+    }
+
+    function createFloor() { 
+      const floorGeometry = new THREE.PlaneGeometry( 50, 50 );  // Width and height of the plane
+      const floorMaterial = new THREE.MeshPhongMaterial( { color: 0x999999, side: THREE.DoubleSide } );  // Color it gray for now
+      const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+
+      // Rotate the floor to be horizontal (plane geometries are vertical by default)
+      floor.rotation.x = Math.PI / 2;
+
+      // Add shadow properties to the floor
+      floor.receiveShadow = true;
+
+      scene.add( floor );
+  }
+
+    function makeInstance( geometry, color, x, y ) {
+
+      const material = new THREE.MeshPhongMaterial( { color: 0x999999, side: THREE.DoubleSide });//{ map: texture1 } );
+
+      const cube = new THREE.Mesh( geometry, material );
+      cube.castShadow = true;
+      cube.receiveShadow = true;
+
+      //scene.add( cube );
+
+      cube.position.x = x;
+      cube.position.y = y;
+
+      return cube;
+
+    }
+
+    
+    const loader = new THREE.TextureLoader();
+  const texture = loader.load(
+    'night_pan.jpg',
+    () => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      texture.colorSpace = THREE.SRGBColorSpace;
+      scene.background = texture;
+    });
+    const cubes = [
+      makeInstance( geometry, 0x44aa88, 0, 0),
+      makeInstance( geometry, 0x8844aa, - 2, 0),
+      makeInstance( geometry, 0xaa8844, 2, 0),
+      //makeInstance( floorGeom, 0x44aa88, 0, -15)
+      
+    ];
+
+    const p_geometry = new THREE.PlaneGeometry( 100, 100);
+    const material = new THREE.MeshPhongMaterial( { color: 0xc0a6a1, side: THREE.DoubleSide } );
+    const plane = new THREE.Mesh( p_geometry, material );
+    plane.rotation.x = -Math.PI / 2; 
+    plane.position.y = -2;
+    plane.receiveShadow = true;
+
+    scene.add( plane );
+
+    const flag_text_loader = new THREE.TextureLoader();
+    const flag_text = loader.load( 'flag.jpg' );
+    texture.colorSpace = THREE.SRGBColorSpace;
+    
+    const flag_geo = new THREE.PlaneGeometry(1, 0.5, 32, 16);
+    const flag_mat = new THREE.MeshBasicMaterial( {map: flag_text, side: THREE.DoubleSide} );
+    const flag_plane = new THREE.Mesh( flag_geo, flag_mat );
+    scene.add( flag_plane );
+
+    const light_color_array = [0xf02800, 0xff8d0a, 0xf5b914, 0x1bd80e, 0x32d3fb, 0xbb32fb];
+    const pole_geo = new THREE.CylinderGeometry(
+	    0.1, 0.1, 7, 8 );
+    const bulb_geo = new THREE.SphereGeometry(0.4, 30, 30);
+    const pole_mat = new THREE.MeshPhongMaterial( { color: 0x999999, side: THREE.DoubleSide } );  // Color it gray for now
+    let pole_z = -4;
+    const bulb_point_intensity = 100;
+
+    for (let i=0; i < 6; i++) {
+
+      const pole = new THREE.Mesh( pole_geo, pole_mat );
+      pole.position.x = -11;
+      pole.position.z = pole_z;
+      pole.castShadow = true;
+      pole.receiveShadow = true;
+      scene.add(pole);
+      
+
+      const bulb_mat = new THREE.MeshPhongMaterial( { color: light_color_array[i], side: THREE.DoubleSide } );  // Color it gray for now
+      const bulb = new THREE.Mesh( bulb_geo, bulb_mat );
+      bulb.position.y = 3.5;
+      bulb.position.x = -11;
+      bulb.position.z = pole_z;
+      bulb.receiveShadow = true;
+      bulb.castShadow = true;
+      scene.add(bulb);
+
+      const bulb_point_light_color = light_color_array[i];
+
+      const bulb_point_light_1 = new THREE.PointLight(bulb_point_light_color, bulb_point_intensity);
+      bulb_point_light_1.position.set(-11, 0, pole_z);
+      //bulb_point_intensity.castShadow = true;
+      scene.add(bulb_point_light_1);
+
+      pole_z += 5;
+    }
+
+    pole_z = -4;
+    for (let i=0; i < 6; i++) {
+
+      const pole = new THREE.Mesh( pole_geo, pole_mat );
+      pole.position.x = -3.5;
+      pole.position.z = pole_z;
+      scene.add(pole);
+
+
+      const bulb_mat = new THREE.MeshPhongMaterial( { color: light_color_array[i], side: THREE.DoubleSide } );  // Color it gray for now
+      const bulb = new THREE.Mesh( bulb_geo, bulb_mat );
+      bulb.position.y = 3.5;
+      bulb.position.x = -3.5;
+      bulb.position.z = pole_z;
+      scene.add(bulb);
+
+      const bulb_point_light_color = light_color_array[i];
+
+      const bulb_point_light_1 = new THREE.PointLight(bulb_point_light_color, bulb_point_intensity);
+      bulb_point_light_1.position.set(-3.5, 0, pole_z);
+      scene.add(bulb_point_light_1);
+
+      pole_z += 5;
+    }
+    const flagPivot = new THREE.Object3D();
+    scene.add(flagPivot); // Add the pivot to the scene
+
+    // Add the flag to the pivot (the flag's center will now rotate around the pivot)
+    flagPivot.add(flag_plane);
+
+    // Position the flag at the right edge by translating the pivot
+    flagPivot.position.x = -7; // Move the pivot to the right edge of the flag (since the flag's width is 4)
+
+    // Set the flag's position relative to the pivot (so it stays in place)
+    //flag_plane.position.x = -10; // The flag is now positioned such that its right edge is at the pivot point
+
+    flagPivot.position.y = 4;
+
+    flagPivot.position.z = -7;
+
+    flagPivot.rotation.x = 1.57;
+
+    let flagRotation = 0; // Initial rotation angle
+
+    
+
+    const flag_pole_geo = new THREE.CylinderGeometry(
+	    0.05, 0.05, 2.5, 8 );
+    const flag_pole_mat = new THREE.MeshPhongMaterial( { color: 0x999999, side: THREE.DoubleSide } );  // Color it gray for now
+    
+    const flag_pole = new THREE.Mesh( flag_pole_geo, flag_pole_mat );
+    flag_pole.position.x = -7;
+    flag_pole.position.z = -8;
+    flag_pole.position.y = 4;
+    flag_pole.castShadow = true;
+    flag_pole.receiveShadow = true;
+    flag_pole.rotation.x = 1.57;
+    scene.add(flag_pole);
+
+    function makeLabelCanvas(size, name) {
+      const borderSize = 2;
+      const ctx = document.createElement('canvas').getContext('2d');
+      const font =  `${size}px bold sans-serif`;
+      ctx.font = font;
+      // measure how long the name will be
+      const doubleBorderSize = borderSize * 2;
+      const width = ctx.measureText(name).width + doubleBorderSize;
+      const height = size + doubleBorderSize;
+      ctx.canvas.width = width;
+      ctx.canvas.height = height;
+    
+      // need to set font again after resizing canvas
+      ctx.font = font;
+      ctx.textBaseline = 'top';
+    
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = 'white';
+      ctx.fillText(name, borderSize, borderSize);
+    
+      return ctx.canvas;
+    }
+
+    const bodyRadiusTop = .4;
+    const bodyRadiusBottom = .2;
+    const bodyHeight = 2;
+    const bodyRadialSegments = 6;
+    const bodyGeometry = new THREE.CylinderGeometry(
+        bodyRadiusTop, bodyRadiusBottom, bodyHeight, bodyRadialSegments);
+    
+    const headRadius = bodyRadiusTop * 0.8;
+    const headLonSegments = 12;
+    const headLatSegments = 5;
+    const headGeometry = new THREE.SphereGeometry(
+        headRadius, headLonSegments, headLatSegments);
+    
+    const labelGeometry = new THREE.PlaneGeometry(1, 1);
+    function makePerson(x, size, name, color) {
+      const canvas = makeLabelCanvas(size, name);
+      const texture = new THREE.CanvasTexture(canvas);
+      // because our canvas is likely not a power of 2
+      // in both dimensions set the filtering appropriately.
+      texture.minFilter = THREE.LinearFilter;
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+    
+      const labelMaterial = new THREE.SpriteMaterial({    map: texture,
+        //color: 0xe614f5,
+        transparent: true,
+      });
+    
+      const root = new THREE.Object3D();
+      root.position.x = x;
+    
+      // const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+      // root.add(body);
+      // body.position.y = bodyHeight / 2;
+    
+      // const head = new THREE.Mesh(headGeometry, bodyMaterial);
+      // root.add(head);
+      // head.position.y = bodyHeight + headRadius * 1.1;
+    
+      const label = new THREE.Sprite(labelMaterial);
+
+      root.add(label);
+      label.position.y = bodyHeight * 4 / 5;
+      label.position.z = bodyRadiusTop * 1.01;
+    
+      // if units are meters then 0.01 here makes size
+      // of the label into centimeters.
+      const labelBaseScale = 0.01;
+      label.scale.x = canvas.width  * labelBaseScale;
+      label.scale.y = canvas.height * labelBaseScale;
+    
+      scene.add(root);
+      return root;
+    }
+makePerson(-2, 32, 'Freie und Hansestadt Hamburg', 'red');
+// makePerson(+3, 32, 'Red Menace', 'red');
+
+    function render(time) {
+      // Convert time to seconds
+      time *= 0.001;
+
+      flagRotation = Math.sin(time) * 0.9; // Adjust amplitude (0.2) and speed (time * 2)
+
+      // Position the flag at the right edge by translating it
+      flag_plane.position.x = 0.5; // Move the flag so its right edge is at (2, 0, 0)
+
+      // Rotate the flag around the right edge (positioned at (2, 0, 0))
+      flagPivot.rotation.y = flagRotation; // Rotate around the Z-axis (flag's side-to-side motion)
+
+      // Render the scene
+      const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+      const imageAspect = texture.image ? texture.image.width / texture.image.height : 1;
+      const aspect = imageAspect / canvasAspect;
+    
+      texture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
+      texture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+    
+      texture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
+      texture.repeat.y = aspect > 1 ? 1 : aspect;
+      cubeCamera1.update(renderer, scene);
+
+      renderer.render(scene, camera);
+    
+      // Keep requesting the next animation frame
+      requestAnimationFrame(render);
+  }
+
+    requestAnimationFrame( render );
+
+  }
+
+  main();
+</script>
+</html>
